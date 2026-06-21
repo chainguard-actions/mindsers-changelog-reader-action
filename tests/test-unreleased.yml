@@ -1,0 +1,35 @@
+name: Test unreleased version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: changelog
+        uses: .
+        with:
+          version: "Unreleased"
+          path: ${{ github.workspace }}/CHANGELOG.md
+
+      - name: Assert version output
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.version }}
+        run: |
+          echo "actual version: $ACTUAL"
+          if [ "$ACTUAL" != "Unreleased" ]; then
+            echo "FAIL: expected version 'Unreleased', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: version is correct"
+
+      - name: Assert status output is unreleased
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.status }}
+        run: |
+          echo "actual status: $ACTUAL"
+          if [ "$ACTUAL" != "unreleased" ]; then
+            echo "FAIL: expected status 'unreleased', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: status is correct"

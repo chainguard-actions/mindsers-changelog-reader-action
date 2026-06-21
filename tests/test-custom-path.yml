@@ -1,0 +1,62 @@
+name: Test custom changelog path
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: changelog
+        uses: .
+        with:
+          version: "1.0.0"
+          path: ${{ github.workspace }}/tests/fixtures/CUSTOM_CHANGELOG.md
+
+      - name: Assert version output
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.version }}
+        run: |
+          echo "actual version: $ACTUAL"
+          if [ "$ACTUAL" != "1.0.0" ]; then
+            echo "FAIL: expected version '1.0.0', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: version is correct"
+
+      - name: Assert date output
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.date }}
+        run: |
+          echo "actual date: $ACTUAL"
+          if [ "$ACTUAL" != "2023-01-15" ]; then
+            echo "FAIL: expected date '2023-01-15', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: date is correct"
+
+      - name: Assert status output is released
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.status }}
+        run: |
+          echo "actual status: $ACTUAL"
+          if [ "$ACTUAL" != "released" ]; then
+            echo "FAIL: expected status 'released', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: status is correct"
+
+      - name: Assert changes contains expected content
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.changes }}
+        run: |
+          echo "actual changes: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected non-empty changes"
+            exit 1
+          fi
+          if echo "$ACTUAL" | grep -q "Initial release"; then
+            echo "PASS: changes contains expected content"
+          else
+            echo "FAIL: changes does not contain 'Initial release'"
+            exit 1
+          fi
