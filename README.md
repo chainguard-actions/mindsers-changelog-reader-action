@@ -1,0 +1,1 @@
+# mindsers-changelog-reader-action
