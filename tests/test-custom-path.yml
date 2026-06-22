@@ -1,0 +1,58 @@
+name: Test custom path - read from fixture CHANGELOG
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: changelog
+        uses: .
+        with:
+          version: "1.2.0"
+          path: ./tests/fixtures/CHANGELOG.md
+
+      - name: Assert version output
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.version }}
+        run: |
+          echo "actual version: $ACTUAL"
+          if [ "$ACTUAL" != "1.2.0" ]; then
+            echo "FAIL: expected version '1.2.0', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: version is correct"
+
+      - name: Assert date output
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.date }}
+        run: |
+          echo "actual date: $ACTUAL"
+          if [ "$ACTUAL" != "2023-06-15" ]; then
+            echo "FAIL: expected date '2023-06-15', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: date is correct"
+
+      - name: Assert status output is released
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.status }}
+        run: |
+          echo "actual status: $ACTUAL"
+          if [ "$ACTUAL" != "released" ]; then
+            echo "FAIL: expected status 'released', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: status is released"
+
+      - name: Assert changes contains expected text
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.changes }}
+        run: |
+          echo "actual changes: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected non-empty changes"
+            exit 1
+          fi
+          echo "PASS: changes is non-empty"
