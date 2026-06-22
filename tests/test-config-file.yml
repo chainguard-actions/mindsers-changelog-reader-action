@@ -1,0 +1,43 @@
+name: Test config_file input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          config_file: ./tests/fixtures/.changelog-reader.json
+          version: 1.0.0
+      - name: Assert version output
+        env:
+          ACTUAL: ${{ steps.action.outputs.version }}
+        run: |
+          echo "actual version: $ACTUAL"
+          if [ "$ACTUAL" != "1.0.0" ]; then
+            echo "FAIL: expected version '1.0.0', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: version is $ACTUAL"
+      - name: Assert status output
+        env:
+          ACTUAL: ${{ steps.action.outputs.status }}
+        run: |
+          echo "actual status: $ACTUAL"
+          if [ "$ACTUAL" != "released" ]; then
+            echo "FAIL: expected status 'released', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: status is $ACTUAL"
+      - name: Assert changes output is non-empty
+        env:
+          ACTUAL: ${{ steps.action.outputs.changes }}
+        run: |
+          echo "actual changes: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected non-empty changes output"
+            exit 1
+          fi
+          echo "PASS: changes is non-empty"
