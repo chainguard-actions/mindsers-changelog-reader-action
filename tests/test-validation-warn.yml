@@ -1,0 +1,49 @@
+name: Test validation level warn
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: changelog
+        uses: .
+        with:
+          path: ./tests/fixtures/CHANGELOG.md
+          version: 1.2.0
+          validation_level: warn
+          validation_depth: 3
+
+      - name: Assert version output
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.version }}
+        run: |
+          echo "actual version: $ACTUAL"
+          if [ "$ACTUAL" != "1.2.0" ]; then
+            echo "FAIL: expected version '1.2.0', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: version matches"
+
+      - name: Assert status is released
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.status }}
+        run: |
+          echo "actual status: $ACTUAL"
+          if [ "$ACTUAL" != "released" ]; then
+            echo "FAIL: expected status 'released', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: status is released"
+
+      - name: Assert changes output is non-empty
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.changes }}
+        run: |
+          echo "actual changes: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected non-empty changes"
+            exit 1
+          fi
+          echo "PASS: changes is non-empty"

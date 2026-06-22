@@ -1,0 +1,162 @@
+import { getEntries } from './get-entries.js'
+import { pep440Adapter } from './version/adapters/pep440.js'
+import { semverAdapter } from './version/adapters/semver.js'
+
+const DATA_v = `
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+### Added
+- The project has now a CHANGELOG
+
+### Fixed
+- README now uses the correct version number in the examples
+
+## [v1.0.1] - 2020-02-12
+### Fixed
+- Remove template's old behavior
+
+## [v1.0.0] - 2020-02-12
+### Added
+- CHANGELOG can be parsed by the github action
+
+[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/mindsers/changelog-reader-action/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/mindsers/changelog-reader-action/releases/tag/v1.0.0
+`
+
+const DATA_complex = `
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.1.2+meta]
+### Added
+- The project has now a CHANGELOG
+
+### Fixed
+- README now uses the correct version number in the examples
+
+## [1.1.1-rc.1+build.123] - 2020-02-12
+### Fixed
+- Remove template's old behavior
+
+## [1.1.1-DEV-SNAPSHOT] - 2020-02-12
+### Added
+- CHANGELOG can be parsed by the github action
+
+## [1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay] - 2019-12-09
+### Added
+- CHANGELOG can be parsed by the github action
+
+[1.1.2+meta]: https://github.com/olivierlacan/keep-a-changelog/compare/v1.1.1-rc.1+build.123...1.1.2+meta
+[1.1.1-rc.1+build.123]: https://github.com/mindsers/changelog-reader-action/compare/v1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay...v1.1.1-rc.1+build.123
+[1.1.1-DEV-SNAPSHOT]: https://github.com/mindsers/changelog-reader-action/compare/v1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay...v1.1.1-DEV-SNAPSHOT
+[1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay]: https://github.com/mindsers/changelog-reader-action/releases/tag/v1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay
+`
+
+const DATA = `
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+### Added
+- The project has now a CHANGELOG
+
+### Fixed
+- README now uses the correct version number in the examples
+
+## [1.0.1] - 2020-02-12
+### Fixed
+- Remove template's old behavior
+
+## [1.0.0] - 2020-02-12
+### Added
+- CHANGELOG can be parsed by the github action
+
+[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/mindsers/changelog-reader-action/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/mindsers/changelog-reader-action/releases/tag/v1.0.0
+`
+
+test('retreive entries from test (tag patern: vX.X.X)', () => {
+  const output = getEntries(DATA_v, semverAdapter)
+  const versionRegex = /^\[(v[0-1]+|unreleased)/i
+
+  expect(output.length).toEqual(3)
+  expect(output[0]).toMatch(versionRegex)
+  expect(output[1]).toMatch(versionRegex)
+  expect(output[2]).toMatch(versionRegex)
+})
+
+test('retreive entries from test (tag patern: X.X.X)', () => {
+  const output = getEntries(DATA, semverAdapter)
+  const versionRegex = /^\[([0-1]+|unreleased)/i
+
+  expect(output.length).toEqual(3)
+  expect(output[0]).toMatch(versionRegex)
+  expect(output[1]).toMatch(versionRegex)
+  expect(output[2]).toMatch(versionRegex)
+})
+
+// https://github.com/mindsers/changelog-reader-action/issues/8
+test('retreive entries from test (complex SEMVER)', () => {
+  const output = getEntries(DATA_complex, semverAdapter)
+  const versionRegex =
+    /^\[(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?/
+
+  expect(output.length).toEqual(4)
+  expect(output[0]).toMatch(versionRegex)
+  expect(output[1]).toMatch(versionRegex)
+  expect(output[2]).toMatch(versionRegex)
+  expect(output[3]).toMatch(versionRegex)
+})
+
+test('captures a bare `## Unreleased` heading (no brackets)', () => {
+  const data = `
+# Changelog
+
+## Unreleased
+### Added
+- Future feature
+
+## [1.0.0] - 2024-01-15
+### Added
+- Initial release
+`
+
+  const output = getEntries(data, semverAdapter)
+
+  expect(output.length).toEqual(2)
+  expect(output[0]).toMatch(/^Unreleased/i)
+  expect(output[1]).toMatch(/^\[1\.0\.0\]/)
+})
+
+test('captures a PEP 440 heading under pep440 but drops it under semver', () => {
+  const data = `
+# Changelog
+
+## [0.1.0a1] - 2024-01-15
+### Added
+- Python alpha prerelease
+
+## [1.0.0] - 2023-06-01
+### Added
+- Stable
+`
+
+  expect(getEntries(data, pep440Adapter).length).toEqual(2)
+  // Under semver, [0.1.0a1] isn't a valid version → dropped; only [1.0.0] stays.
+  const semverEntries = getEntries(data, semverAdapter)
+  expect(semverEntries.length).toEqual(1)
+  expect(semverEntries[0]).toMatch(/^\[1\.0\.0\]/)
+})

@@ -1,0 +1,59 @@
+name: Test PEP440 version scheme
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: changelog
+        uses: .
+        with:
+          path: ./tests/fixtures/CHANGELOG-pep440.md
+          version: 1.1.0a1
+          version_scheme: pep440
+
+      - name: Assert version output
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.version }}
+        run: |
+          echo "actual version: $ACTUAL"
+          if [ "$ACTUAL" != "1.1.0a1" ]; then
+            echo "FAIL: expected version '1.1.0a1', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: version matches"
+
+      - name: Assert status is prereleased
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.status }}
+        run: |
+          echo "actual status: $ACTUAL"
+          if [ "$ACTUAL" != "prereleased" ]; then
+            echo "FAIL: expected status 'prereleased', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: status is prereleased"
+
+      - name: Assert date output
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.date }}
+        run: |
+          echo "actual date: $ACTUAL"
+          if [ "$ACTUAL" != "2023-03-01" ]; then
+            echo "FAIL: expected date '2023-03-01', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: date matches"
+
+      - name: Assert changes output is non-empty
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.changes }}
+        run: |
+          echo "actual changes: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected non-empty changes"
+            exit 1
+          fi
+          echo "PASS: changes is non-empty"

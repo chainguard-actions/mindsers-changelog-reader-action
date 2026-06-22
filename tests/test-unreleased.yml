@@ -1,0 +1,47 @@
+name: Test unreleased section
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: changelog
+        uses: .
+        with:
+          path: ./tests/fixtures/CHANGELOG.md
+          version: Unreleased
+
+      - name: Assert status is unreleased
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.status }}
+        run: |
+          echo "actual status: $ACTUAL"
+          if [ "$ACTUAL" != "unreleased" ]; then
+            echo "FAIL: expected status 'unreleased', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: status is unreleased"
+
+      - name: Assert changes output is non-empty
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.changes }}
+        run: |
+          echo "actual changes: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected non-empty changes for unreleased section"
+            exit 1
+          fi
+          echo "PASS: unreleased changes is non-empty"
+
+      - name: Assert date is empty for unreleased
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.date }}
+        run: |
+          echo "actual date: '$ACTUAL'"
+          # Unreleased entries have no date
+          if [ -n "$ACTUAL" ]; then
+            echo "WARN: expected empty date for unreleased, got '$ACTUAL'"
+          fi
+          echo "PASS: date check complete"

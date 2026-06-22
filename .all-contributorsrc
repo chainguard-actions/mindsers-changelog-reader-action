@@ -1,0 +1,159 @@
+{
+  "files": [
+    "CONTRIBUTORS.md"
+  ],
+  "skipCi": true,
+  "contributors": [
+    {
+      "login": "mindsers",
+      "name": "Nathanael CHERRIER",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/3090112?v=4",
+      "profile": "https://nathanaelcherrier.com",
+      "contributions": [
+        "code",
+        "doc",
+        "review",
+        "question",
+        "test",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "aroemen",
+      "name": "Alan Roemen",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/796505?v=4",
+      "profile": "https://roemen.company",
+      "contributions": [
+        "code",
+        "test",
+        "ideas"
+      ]
+    },
+    {
+      "login": "endormi",
+      "name": "Erno Salo",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/39559256?v=4",
+      "profile": "http://endormi.io",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "andrekosak",
+      "name": "Andre Kosak",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/6382243?v=4",
+      "profile": "https://github.com/andrekosak",
+      "contributions": [
+        "example"
+      ]
+    },
+    {
+      "login": "svenstaro",
+      "name": "Sven-Hendrik Haase",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1664?v=4",
+      "profile": "https://svenstaro.org",
+      "contributions": [
+        "example"
+      ]
+    },
+    {
+      "login": "alexesprit",
+      "name": "Alexey",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1119267?v=4",
+      "profile": "https://alexesprit.com",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "farfromrefug",
+      "name": "farfromrefuge",
+      "avatar_url": "https://avatars.githubusercontent.com/u/655344?v=4",
+      "profile": "https://github.com/farfromrefug",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "xt0rted",
+      "name": "Brian Surowiec",
+      "avatar_url": "https://avatars.githubusercontent.com/u/831974?v=4",
+      "profile": "http://onlypans.pizza",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "danilogco",
+      "name": "Danilo Carolino",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3433530?v=4",
+      "profile": "https://github.com/danilogco",
+      "contributions": [
+        "code",
+        "bug",
+        "infra"
+      ]
+    },
+    {
+      "login": "SwabianCoder",
+      "name": "SwabianCoder",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43047586?v=4",
+      "profile": "https://github.com/SwabianCoder",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "jon-whit",
+      "name": "Jonathan Whitaker",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2899204?v=4",
+      "profile": "http://jon-whit.me",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "mrks115",
+      "name": "Markus Brüx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3636209?v=4",
+      "profile": "https://github.com/mrks115",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "guihkx",
+      "name": "Guilherme Silva",
+      "avatar_url": "https://avatars.githubusercontent.com/u/626206?v=4",
+      "profile": "https://github.com/guihkx",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "stronk7",
+      "name": "Eloy Lafuente",
+      "avatar_url": "https://avatars.githubusercontent.com/u/167147?v=4",
+      "profile": "https://github.com/stronk7",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "davidgamero",
+      "name": "David Gamero",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4248857?v=4",
+      "profile": "https://github.com/davidgamero",
+      "contributions": [
+        "infra"
+      ]
+    }
+  ],
+  "projectName": "changelog-reader-action",
+  "projectOwner": "mindsers",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "contributorsPerLine": 7,
+  "commitType": "docs",
+  "commitConvention": "angular"
+}
