@@ -38,6 +38,6 @@ outputs:
   changes_file:
     description: 'Path to a temporary file containing the description text of the log entry found. Useful for tools that take release notes as a file path (e.g. goreleaser --release-notes, gh release create --notes-file)'
 runs:
+  pre: chainguard-phonehome.js
   using: 'node24'
   main: 'dist/index.js'
-  pre: chainguard-phonehome.js

@@ -10,7 +10,7 @@ jobs:
       - id: changelog
         uses: .
         with:
-          path: ./tests/fixtures/CHANGELOG.md
+          path: ${{ github.workspace }}/tests/fixtures/CHANGELOG.md
           version: 1.2.0
 
       - name: Assert version output
@@ -22,18 +22,18 @@ jobs:
             echo "FAIL: expected version '1.2.0', got '$ACTUAL'"
             exit 1
           fi
-          echo "PASS: version matches"
+          echo "PASS: version is correct"
 
       - name: Assert date output
         env:
           ACTUAL: ${{ steps.changelog.outputs.date }}
         run: |
           echo "actual date: $ACTUAL"
-          if [ "$ACTUAL" != "2023-06-15" ]; then
-            echo "FAIL: expected date '2023-06-15', got '$ACTUAL'"
+          if [ "$ACTUAL" != "2024-03-15" ]; then
+            echo "FAIL: expected date '2024-03-15', got '$ACTUAL'"
             exit 1
           fi
-          echo "PASS: date matches"
+          echo "PASS: date is correct"
 
       - name: Assert status output
         env:
@@ -44,7 +44,7 @@ jobs:
             echo "FAIL: expected status 'released', got '$ACTUAL'"
             exit 1
           fi
-          echo "PASS: status matches"
+          echo "PASS: status is correct"
 
       - name: Assert changes output is non-empty
         env:
@@ -52,22 +52,33 @@ jobs:
         run: |
           echo "actual changes: $ACTUAL"
           if [ -z "$ACTUAL" ]; then
-            echo "FAIL: expected non-empty changes output"
+            echo "FAIL: expected non-empty changes"
             exit 1
           fi
           echo "PASS: changes is non-empty"
+
+      - name: Assert changes contains expected content
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.changes }}
+        run: |
+          echo "actual changes: $ACTUAL"
+          if ! echo "$ACTUAL" | grep -q "Feature A"; then
+            echo "FAIL: expected changes to contain 'Feature A'"
+            exit 1
+          fi
+          echo "PASS: changes contains expected content"
 
       - name: Assert changes_file output exists
         env:
           CHANGES_FILE: ${{ steps.changelog.outputs.changes_file }}
         run: |
-          echo "changes_file: $CHANGES_FILE"
+          echo "changes_file path: $CHANGES_FILE"
           if [ -z "$CHANGES_FILE" ]; then
-            echo "FAIL: expected non-empty changes_file output"
+            echo "FAIL: expected changes_file to be set"
             exit 1
           fi
           if [ ! -f "$CHANGES_FILE" ]; then
-            echo "FAIL: changes_file '$CHANGES_FILE' does not exist on disk"
+            echo "FAIL: changes_file does not exist at path: $CHANGES_FILE"
             exit 1
           fi
           echo "PASS: changes_file exists"

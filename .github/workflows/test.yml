@@ -1,0 +1,118 @@
+name: "units-test"
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - "releases/*"
+
+permissions:
+  contents: read
+
+jobs:
+  # unit tests
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm test
+      - name: Verify dist/ is up to date
+        run: |
+          npm run build
+          if ! git diff --exit-code --stat dist/; then
+            echo "::error::dist/ is out of sync with src/. Run 'npm run build' and commit the result." >&2
+            exit 1
+          fi
+
+  # End-to-end matrix: exercise the key code paths against this repo's
+  # CHANGELOG and a small set of fixture files. Each matrix entry runs
+  # the action as a consumer would, then asserts on the produced outputs.
+  e2e:
+    name: e2e - ${{ matrix.scenario }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - scenario: latest released (default)
+            expected_status: released
+          - scenario: specific version
+            version: '2.2.3'
+            expected_version: '2.2.3'
+            expected_status: released
+          - scenario: unreleased section
+            path: ./.github/fixtures/changelog-unreleased.md
+            version: Unreleased
+            expected_version: Unreleased
+            expected_status: unreleased
+          - scenario: yanked fixture
+            path: ./.github/fixtures/changelog-yanked.md
+            expected_version: '2.0.0'
+            expected_status: yanked
+          - scenario: prereleased fixture
+            path: ./.github/fixtures/changelog-prereleased.md
+            expected_version: 2.0.0-alpha.1
+            expected_status: prereleased
+          - scenario: config file (yml)
+            config_file: ./.github/fixtures/.changelog-reader.yml
+            expected_version: '1.0.0'
+            expected_status: released
+          - scenario: validation warn on own changelog
+            validation_level: warn
+            expected_status: released
+          - scenario: pep440 prerelease fixture
+            path: ./.github/fixtures/changelog-pep440.md
+            version_scheme: pep440
+            expected_version: 0.1.0a1
+            expected_status: prereleased
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup Node.js 24
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24
+      - name: Run the changelog reader
+        id: changelog_reader
+        uses: ./
+        with:
+          config_file: ${{ matrix.config_file }}
+          path: ${{ matrix.path }}
+          version: ${{ matrix.version }}
+          validation_level: ${{ matrix.validation_level }}
+          version_scheme: ${{ matrix.version_scheme }}
+      - name: Assert outputs
+        env:
+          GOT_VERSION: ${{ steps.changelog_reader.outputs.version }}
+          GOT_DATE: ${{ steps.changelog_reader.outputs.date }}
+          GOT_STATUS: ${{ steps.changelog_reader.outputs.status }}
+          GOT_CHANGES: ${{ steps.changelog_reader.outputs.changes }}
+          GOT_CHANGES_FILE: ${{ steps.changelog_reader.outputs.changes_file }}
+          EXPECTED_VERSION: ${{ matrix.expected_version }}
+          EXPECTED_STATUS: ${{ matrix.expected_status }}
+        run: |
+          echo "version: $GOT_VERSION"
+          echo "date: $GOT_DATE"
+          echo "status: $GOT_STATUS"
+          echo "changes: ${#GOT_CHANGES} chars"
+          echo "changes_file: $GOT_CHANGES_FILE"
+          if [ -n "$EXPECTED_VERSION" ] && [ "$GOT_VERSION" != "$EXPECTED_VERSION" ]; then
+            echo "::error::version mismatch: got '$GOT_VERSION', expected '$EXPECTED_VERSION'"
+            exit 1
+          fi
+          if [ -n "$EXPECTED_STATUS" ] && [ "$GOT_STATUS" != "$EXPECTED_STATUS" ]; then
+            echo "::error::status mismatch: got '$GOT_STATUS', expected '$EXPECTED_STATUS'"
+            exit 1
+          fi
+          if [ -z "$GOT_CHANGES" ]; then
+            echo "::error::changes output is empty"
+            exit 1
+          fi
+          if [ ! -s "$GOT_CHANGES_FILE" ]; then
+            echo "::error::changes_file is missing or empty: '$GOT_CHANGES_FILE'"
+            exit 1
+          fi

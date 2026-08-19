@@ -1,0 +1,59 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: release ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version and validate against package.json
+        id: version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version="${TAG#v}"
+          pkg_version=$(node -p "require('./package.json').version")
+          if [ "$version" != "$pkg_version" ]; then
+            echo "::error::Tag $TAG does not match package.json version $pkg_version"
+            exit 1
+          fi
+          safe=$(printf '%s' "$version" | tr -d '\n\r')
+          echo "value=$safe" >> "$GITHUB_OUTPUT"
+
+      - name: Extract release notes from CHANGELOG
+        id: notes
+        uses: mindsers/changelog-reader-action@1faaf50aa09d5793d9a100819973df801febfb31 # v2
+        with:
+          path: ./CHANGELOG.md
+          version: ${{ steps.version.outputs.value }}
+          validation_level: warn
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          NOTES: ${{ steps.notes.outputs.changes }}
+        run: |
+          gh release create "$TAG" --title "$TAG" --notes "$NOTES" --verify-tag
+
+      - name: Move floating major-version tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version="${TAG#v}"
+          major="v${version%%.*}"
+          echo "Moving $major to point at $TAG"
+          git tag -f "$major" "$TAG"
+          git push origin "$major" --force

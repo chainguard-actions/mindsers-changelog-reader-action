@@ -10,8 +10,19 @@ jobs:
       - id: changelog
         uses: .
         with:
-          path: ./tests/fixtures/CHANGELOG.md
+          path: ${{ github.workspace }}/tests/fixtures/CHANGELOG.md
           version: Unreleased
+
+      - name: Assert version output is Unreleased
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.version }}
+        run: |
+          echo "actual version: $ACTUAL"
+          if [ "$ACTUAL" != "Unreleased" ]; then
+            echo "FAIL: expected version 'Unreleased', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: version is Unreleased"
 
       - name: Assert status is unreleased
         env:
@@ -24,24 +35,13 @@ jobs:
           fi
           echo "PASS: status is unreleased"
 
-      - name: Assert changes output is non-empty
+      - name: Assert changes output contains unreleased content
         env:
           ACTUAL: ${{ steps.changelog.outputs.changes }}
         run: |
           echo "actual changes: $ACTUAL"
-          if [ -z "$ACTUAL" ]; then
-            echo "FAIL: expected non-empty changes for unreleased section"
+          if ! echo "$ACTUAL" | grep -q "upcoming feature"; then
+            echo "FAIL: expected changes to contain 'upcoming feature'"
             exit 1
           fi
-          echo "PASS: unreleased changes is non-empty"
-
-      - name: Assert date is empty for unreleased
-        env:
-          ACTUAL: ${{ steps.changelog.outputs.date }}
-        run: |
-          echo "actual date: '$ACTUAL'"
-          # Unreleased entries have no date
-          if [ -n "$ACTUAL" ]; then
-            echo "WARN: expected empty date for unreleased, got '$ACTUAL'"
-          fi
-          echo "PASS: date check complete"
+          echo "PASS: changes contains unreleased content"

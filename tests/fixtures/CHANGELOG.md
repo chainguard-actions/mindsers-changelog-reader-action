@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Some upcoming feature
 
-## [1.2.0] - 2023-06-15
+## [1.2.0] - 2024-03-15
 
 ### Added
 
@@ -18,9 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Bug C was fixed
+- Bug X was fixed
 
-## [1.1.0] - 2023-03-01
+## [1.1.0] - 2024-01-10
 
 ### Added
 
@@ -30,13 +30,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Improved performance
 
-## [1.0.0] - 2023-01-10
+## [1.0.0] - 2023-12-01
 
 ### Added
 
-- First release
+- First stable release
 
-[unreleased]: https://github.com/example/repo/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/example/repo/compare/v1.2.0...HEAD
 [1.2.0]: https://github.com/example/repo/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/example/repo/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/example/repo/releases/tag/v1.0.0

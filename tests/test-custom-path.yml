@@ -1,4 +1,4 @@
-name: Test config_file input
+name: Test custom CHANGELOG path
 on:
   workflow_dispatch:
 jobs:
@@ -10,16 +10,16 @@ jobs:
       - id: changelog
         uses: .
         with:
-          config_file: ${{ github.workspace }}/tests/fixtures/changelog-reader-config.json
           path: ${{ github.workspace }}/tests/fixtures/CHANGELOG.md
+          version: 1.0.0
 
       - name: Assert version output
         env:
           ACTUAL: ${{ steps.changelog.outputs.version }}
         run: |
           echo "actual version: $ACTUAL"
-          if [ "$ACTUAL" != "1.1.0" ]; then
-            echo "FAIL: expected version '1.1.0' (from config_file), got '$ACTUAL'"
+          if [ "$ACTUAL" != "1.0.0" ]; then
+            echo "FAIL: expected version '1.0.0', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS: version is correct"
@@ -29,8 +29,8 @@ jobs:
           ACTUAL: ${{ steps.changelog.outputs.date }}
         run: |
           echo "actual date: $ACTUAL"
-          if [ "$ACTUAL" != "2024-01-10" ]; then
-            echo "FAIL: expected date '2024-01-10', got '$ACTUAL'"
+          if [ "$ACTUAL" != "2023-12-01" ]; then
+            echo "FAIL: expected date '2023-12-01', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS: date is correct"
@@ -46,24 +46,13 @@ jobs:
           fi
           echo "PASS: status is released"
 
-      - name: Assert changes output is non-empty
+      - name: Assert changes contains first release content
         env:
           ACTUAL: ${{ steps.changelog.outputs.changes }}
         run: |
           echo "actual changes: $ACTUAL"
-          if [ -z "$ACTUAL" ]; then
-            echo "FAIL: expected non-empty changes"
-            exit 1
-          fi
-          echo "PASS: changes is non-empty"
-
-      - name: Assert changes contains expected content
-        env:
-          ACTUAL: ${{ steps.changelog.outputs.changes }}
-        run: |
-          echo "actual changes: $ACTUAL"
-          if ! echo "$ACTUAL" | grep -q "Initial feature set"; then
-            echo "FAIL: expected changes to contain 'Initial feature set'"
+          if ! echo "$ACTUAL" | grep -q "First stable release"; then
+            echo "FAIL: expected changes to contain 'First stable release'"
             exit 1
           fi
           echo "PASS: changes contains expected content"
