@@ -6,33 +6,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
       - id: changelog
         uses: .
         with:
-          path: ${{ github.workspace }}/CHANGELOG.md
+          path: tests/fixtures/CHANGELOG.md
           # No version specified - should return the latest released version
 
-      - name: Assert version output is non-empty
+      - name: Assert version output is the latest released version
         env:
           ACTUAL: ${{ steps.changelog.outputs.version }}
         run: |
           echo "actual version: $ACTUAL"
-          if [ -z "$ACTUAL" ]; then
-            echo "FAIL: expected non-empty version output"
+          if [ "$ACTUAL" != "1.2.0" ]; then
+            echo "FAIL: expected latest version '1.2.0' but got '$ACTUAL'"
             exit 1
           fi
-          echo "PASS: version is non-empty: $ACTUAL"
+          echo "PASS: latest version is correct"
 
-      - name: Assert status output is non-empty
+      - name: Assert status output is released
         env:
           ACTUAL: ${{ steps.changelog.outputs.status }}
         run: |
           echo "actual status: $ACTUAL"
-          if [ -z "$ACTUAL" ]; then
-            echo "FAIL: expected non-empty status output"
+          if [ "$ACTUAL" != "released" ]; then
+            echo "FAIL: expected status 'released' but got '$ACTUAL'"
             exit 1
           fi
-          echo "PASS: status is non-empty: $ACTUAL"
+          echo "PASS: status is released"
 
       - name: Assert changes output is non-empty
         env:

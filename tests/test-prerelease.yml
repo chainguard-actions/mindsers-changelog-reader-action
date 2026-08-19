@@ -1,0 +1,58 @@
+name: Test prerelease version status
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: changelog
+        uses: .
+        with:
+          path: tests/fixtures/CHANGELOG-prerelease.md
+          version: 2.0.0-beta.1
+
+      - name: Assert version output
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.version }}
+        run: |
+          echo "actual version: $ACTUAL"
+          if [ "$ACTUAL" != "2.0.0-beta.1" ]; then
+            echo "FAIL: expected version '2.0.0-beta.1' but got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: version is correct"
+
+      - name: Assert status output is prereleased
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.status }}
+        run: |
+          echo "actual status: $ACTUAL"
+          if [ "$ACTUAL" != "prereleased" ]; then
+            echo "FAIL: expected status 'prereleased' but got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: status is prereleased"
+
+      - name: Assert date output
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.date }}
+        run: |
+          echo "actual date: $ACTUAL"
+          if [ "$ACTUAL" != "2023-09-01" ]; then
+            echo "FAIL: expected date '2023-09-01' but got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: date is correct"
+
+      - name: Assert changes output contains beta content
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.changes }}
+        run: |
+          echo "actual changes: $ACTUAL"
+          if ! echo "$ACTUAL" | grep -q "Beta feature X"; then
+            echo "FAIL: expected changes to contain 'Beta feature X'"
+            exit 1
+          fi
+          echo "PASS: changes contains expected beta content"
