@@ -1,4 +1,4 @@
-name: Test basic - read specific released version
+name: Test basic usage - read specific version
 on:
   workflow_dispatch:
 jobs:
@@ -7,37 +7,37 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - id: changelog
+      - id: action
         uses: .
         with:
-          version: "2.2.2"
-          path: ./CHANGELOG.md
+          path: tests/fixtures/CHANGELOG.md
+          version: "1.2.0"
 
       - name: Assert version output
         env:
-          ACTUAL: ${{ steps.changelog.outputs.version }}
+          ACTUAL: ${{ steps.action.outputs.version }}
         run: |
           echo "actual version: $ACTUAL"
-          if [ "$ACTUAL" != "2.2.2" ]; then
-            echo "FAIL: expected version '2.2.2', got '$ACTUAL'"
+          if [ "$ACTUAL" != "1.2.0" ]; then
+            echo "FAIL: expected version '1.2.0', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS: version is correct"
 
       - name: Assert date output
         env:
-          ACTUAL: ${{ steps.changelog.outputs.date }}
+          ACTUAL: ${{ steps.action.outputs.date }}
         run: |
           echo "actual date: $ACTUAL"
-          if [ "$ACTUAL" != "2022-11-23" ]; then
-            echo "FAIL: expected date '2022-11-23', got '$ACTUAL'"
+          if [ "$ACTUAL" != "2023-06-15" ]; then
+            echo "FAIL: expected date '2023-06-15', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS: date is correct"
 
       - name: Assert status output
         env:
-          ACTUAL: ${{ steps.changelog.outputs.status }}
+          ACTUAL: ${{ steps.action.outputs.status }}
         run: |
           echo "actual status: $ACTUAL"
           if [ "$ACTUAL" != "released" ]; then
@@ -48,7 +48,7 @@ jobs:
 
       - name: Assert changes output is non-empty
         env:
-          ACTUAL: ${{ steps.changelog.outputs.changes }}
+          ACTUAL: ${{ steps.action.outputs.changes }}
         run: |
           echo "actual changes: $ACTUAL"
           if [ -z "$ACTUAL" ]; then

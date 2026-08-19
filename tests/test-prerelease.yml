@@ -1,4 +1,4 @@
-name: Test changelog validation
+name: Test pre-release version status
 on:
   workflow_dispatch:
 jobs:
@@ -10,40 +10,38 @@ jobs:
       - id: action
         uses: .
         with:
-          path: tests/fixtures/CHANGELOG.md
-          version: "1.1.0"
-          validation_level: "warn"
-          validation_depth: "5"
+          path: tests/fixtures/CHANGELOG-prerelease.md
+          version: "2.0.0-beta.1"
 
       - name: Assert version output
         env:
           ACTUAL: ${{ steps.action.outputs.version }}
         run: |
           echo "actual version: $ACTUAL"
-          if [ "$ACTUAL" != "1.1.0" ]; then
-            echo "FAIL: expected version '1.1.0', got '$ACTUAL'"
+          if [ "$ACTUAL" != "2.0.0-beta.1" ]; then
+            echo "FAIL: expected version '2.0.0-beta.1', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS: version is correct"
 
-      - name: Assert status is released
+      - name: Assert status is prereleased
         env:
           ACTUAL: ${{ steps.action.outputs.status }}
         run: |
           echo "actual status: $ACTUAL"
-          if [ "$ACTUAL" != "released" ]; then
-            echo "FAIL: expected status 'released', got '$ACTUAL'"
+          if [ "$ACTUAL" != "prereleased" ]; then
+            echo "FAIL: expected status 'prereleased', got '$ACTUAL'"
             exit 1
           fi
-          echo "PASS: status is released"
+          echo "PASS: status is prereleased"
 
       - name: Assert date output
         env:
           ACTUAL: ${{ steps.action.outputs.date }}
         run: |
           echo "actual date: $ACTUAL"
-          if [ "$ACTUAL" != "2023-03-10" ]; then
-            echo "FAIL: expected date '2023-03-10', got '$ACTUAL'"
+          if [ "$ACTUAL" != "2023-08-01" ]; then
+            echo "FAIL: expected date '2023-08-01', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS: date is correct"
@@ -54,7 +52,7 @@ jobs:
         run: |
           echo "actual changes: $ACTUAL"
           if [ -z "$ACTUAL" ]; then
-            echo "FAIL: expected non-empty changes"
+            echo "FAIL: expected non-empty changes for pre-release entry"
             exit 1
           fi
           echo "PASS: changes is non-empty"

@@ -1,4 +1,4 @@
-name: Test unreleased - read unreleased section
+name: Test unreleased section
 on:
   workflow_dispatch:
 jobs:
@@ -7,15 +7,26 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - id: changelog
+      - id: action
         uses: .
         with:
+          path: tests/fixtures/CHANGELOG.md
           version: "Unreleased"
-          path: ./CHANGELOG.md
 
-      - name: Assert version output is Unreleased
+      - name: Assert status is unreleased
         env:
-          ACTUAL: ${{ steps.changelog.outputs.version }}
+          ACTUAL: ${{ steps.action.outputs.status }}
+        run: |
+          echo "actual status: $ACTUAL"
+          if [ "$ACTUAL" != "unreleased" ]; then
+            echo "FAIL: expected status 'unreleased', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: status is unreleased"
+
+      - name: Assert version output
+        env:
+          ACTUAL: ${{ steps.action.outputs.version }}
         run: |
           echo "actual version: $ACTUAL"
           if [ "$ACTUAL" != "Unreleased" ]; then
@@ -24,13 +35,13 @@ jobs:
           fi
           echo "PASS: version is Unreleased"
 
-      - name: Assert status output is unreleased
+      - name: Assert changes output is non-empty
         env:
-          ACTUAL: ${{ steps.changelog.outputs.status }}
+          ACTUAL: ${{ steps.action.outputs.changes }}
         run: |
-          echo "actual status: $ACTUAL"
-          if [ "$ACTUAL" != "unreleased" ]; then
-            echo "FAIL: expected status 'unreleased', got '$ACTUAL'"
+          echo "actual changes: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected non-empty changes for Unreleased section"
             exit 1
           fi
-          echo "PASS: status is unreleased"
+          echo "PASS: changes is non-empty"

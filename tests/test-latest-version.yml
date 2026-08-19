@@ -1,4 +1,4 @@
-name: Test changelog validation
+name: Test latest version (no version specified)
 on:
   workflow_dispatch:
 jobs:
@@ -11,20 +11,18 @@ jobs:
         uses: .
         with:
           path: tests/fixtures/CHANGELOG.md
-          version: "1.1.0"
-          validation_level: "warn"
-          validation_depth: "5"
+          # No version specified - should return the latest released version
 
-      - name: Assert version output
+      - name: Assert version output is latest
         env:
           ACTUAL: ${{ steps.action.outputs.version }}
         run: |
           echo "actual version: $ACTUAL"
-          if [ "$ACTUAL" != "1.1.0" ]; then
-            echo "FAIL: expected version '1.1.0', got '$ACTUAL'"
+          if [ "$ACTUAL" != "1.2.0" ]; then
+            echo "FAIL: expected latest version '1.2.0', got '$ACTUAL'"
             exit 1
           fi
-          echo "PASS: version is correct"
+          echo "PASS: latest version is correct"
 
       - name: Assert status is released
         env:
@@ -42,8 +40,8 @@ jobs:
           ACTUAL: ${{ steps.action.outputs.date }}
         run: |
           echo "actual date: $ACTUAL"
-          if [ "$ACTUAL" != "2023-03-10" ]; then
-            echo "FAIL: expected date '2023-03-10', got '$ACTUAL'"
+          if [ "$ACTUAL" != "2023-06-15" ]; then
+            echo "FAIL: expected date '2023-06-15', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS: date is correct"

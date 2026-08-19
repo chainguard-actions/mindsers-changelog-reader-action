@@ -7,32 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Some upcoming feature
-
-## [1.2.0] - 2023-06-15
+## [2.0.0-beta.1] - 2023-08-01
 
 ### Added
 
-- New feature A
-- New feature B
-
-### Fixed
-
-- Bug fix C
-
-## [1.1.0] - 2023-03-10
-
-### Added
-
-- Initial feature set
+- Beta feature X
+- Beta feature Y
 
 ## [1.0.0] - 2023-01-01
 
 ### Added
 
-- First release
+- First stable release
 
-[Unreleased]: https://github.com/example/repo/compare/v1.2.0...HEAD
-[1.2.0]: https://github.com/example/repo/compare/v1.1.0...v1.2.0
-[1.1.0]: https://github.com/example/repo/compare/v1.0.0...v1.1.0
+[Unreleased]: https://github.com/example/repo/compare/v2.0.0-beta.1...HEAD
+[2.0.0-beta.1]: https://github.com/example/repo/compare/v1.0.0...v2.0.0-beta.1
 [1.0.0]: https://github.com/example/repo/releases/tag/v1.0.0

@@ -1,4 +1,4 @@
-name: Test changelog validation
+name: Test default changelog path
 on:
   workflow_dispatch:
 jobs:
@@ -7,21 +7,44 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Create a CHANGELOG.md in workspace root for default path test
+        run: |
+          cat > "$GITHUB_WORKSPACE/CHANGELOG.md" << 'EOF'
+          # Changelog
+
+          All notable changes to this project will be documented in this file.
+
+          The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+          and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+          ## [Unreleased]
+
+          ## [3.0.0] - 2024-01-15
+
+          ### Added
+
+          - Default path test feature
+
+          ## [2.0.0] - 2023-06-01
+
+          ### Added
+
+          - Previous release feature
+          EOF
+
       - id: action
         uses: .
         with:
-          path: tests/fixtures/CHANGELOG.md
-          version: "1.1.0"
-          validation_level: "warn"
-          validation_depth: "5"
+          version: "3.0.0"
+          # Uses default path: ./CHANGELOG.md
 
       - name: Assert version output
         env:
           ACTUAL: ${{ steps.action.outputs.version }}
         run: |
           echo "actual version: $ACTUAL"
-          if [ "$ACTUAL" != "1.1.0" ]; then
-            echo "FAIL: expected version '1.1.0', got '$ACTUAL'"
+          if [ "$ACTUAL" != "3.0.0" ]; then
+            echo "FAIL: expected version '3.0.0', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS: version is correct"
@@ -36,17 +59,6 @@ jobs:
             exit 1
           fi
           echo "PASS: status is released"
-
-      - name: Assert date output
-        env:
-          ACTUAL: ${{ steps.action.outputs.date }}
-        run: |
-          echo "actual date: $ACTUAL"
-          if [ "$ACTUAL" != "2023-03-10" ]; then
-            echo "FAIL: expected date '2023-03-10', got '$ACTUAL'"
-            exit 1
-          fi
-          echo "PASS: date is correct"
 
       - name: Assert changes output is non-empty
         env:

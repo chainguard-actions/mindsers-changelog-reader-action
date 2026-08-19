@@ -1,0 +1,45 @@
+name: 'units-test'
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - 'releases/*'
+
+permissions:
+  contents: read
+
+jobs:
+  # unit tests
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
+      - run: npm ci
+      - run: npm test
+
+  # test action works running from the graph
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
+      - name: Run the changelog reader
+        id: changelog_reader
+        uses: ./
+      - name: Display output
+        env:
+          VERSION: ${{ steps.changelog_reader.outputs.version }}
+          DATE: ${{ steps.changelog_reader.outputs.date }}
+          STATUS: ${{ steps.changelog_reader.outputs.status }}
+          CHANGES: ${{ steps.changelog_reader.outputs.changes }}
+        run: |
+          echo "Version: $VERSION"
+          echo "Date: $DATE"
+          echo "Status: $STATUS"
+          echo "Changes: $CHANGES"
+      - name: Check output
+        env:
+          CHANGES: ${{ steps.changelog_reader.outputs.changes }}
+        run: |
+          test "Changes: $CHANGES" != ""
