@@ -1,4 +1,4 @@
-name: Test latest version lookup (no version specified)
+name: Test latest version (no version specified)
 on:
   workflow_dispatch:
 jobs:
@@ -6,11 +6,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
       - id: changelog
         uses: .
         with:
-          path: ./CHANGELOG.md
-          # No version specified — should return the latest released entry
+          path: tests/fixtures/CHANGELOG.md
+          # No version specified - should return the latest released version
 
       - name: Assert version output is non-empty
         env:
@@ -18,10 +19,10 @@ jobs:
         run: |
           echo "actual version: $ACTUAL"
           if [ -z "$ACTUAL" ]; then
-            echo "FAIL: expected non-empty version output"
+            echo "FAIL: expected non-empty version"
             exit 1
           fi
-          echo "PASS"
+          echo "PASS: version is non-empty: $ACTUAL"
 
       - name: Assert status output is non-empty
         env:
@@ -29,10 +30,10 @@ jobs:
         run: |
           echo "actual status: $ACTUAL"
           if [ -z "$ACTUAL" ]; then
-            echo "FAIL: expected non-empty status output"
+            echo "FAIL: expected non-empty status"
             exit 1
           fi
-          echo "PASS"
+          echo "PASS: status is non-empty: $ACTUAL"
 
       - name: Assert changes output is non-empty
         env:
@@ -40,7 +41,7 @@ jobs:
         run: |
           echo "actual changes: $ACTUAL"
           if [ -z "$ACTUAL" ]; then
-            echo "FAIL: expected non-empty changes output"
+            echo "FAIL: expected non-empty changes"
             exit 1
           fi
-          echo "PASS"
+          echo "PASS: changes is non-empty"

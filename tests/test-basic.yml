@@ -1,4 +1,4 @@
-name: Test changelog validation
+name: Test basic usage - read specific version
 on:
   workflow_dispatch:
 jobs:
@@ -12,8 +12,6 @@ jobs:
         with:
           path: tests/fixtures/CHANGELOG.md
           version: 1.2.0
-          validation_level: warn
-          validation_depth: 5
 
       - name: Assert version output
         env:
@@ -26,7 +24,18 @@ jobs:
           fi
           echo "PASS: version is correct"
 
-      - name: Assert status output is released
+      - name: Assert date output
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.date }}
+        run: |
+          echo "actual date: $ACTUAL"
+          if [ "$ACTUAL" != "2023-06-15" ]; then
+            echo "FAIL: expected date '2023-06-15' but got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: date is correct"
+
+      - name: Assert status output
         env:
           ACTUAL: ${{ steps.changelog.outputs.status }}
         run: |
@@ -35,7 +44,7 @@ jobs:
             echo "FAIL: expected status 'released' but got '$ACTUAL'"
             exit 1
           fi
-          echo "PASS: status is released"
+          echo "PASS: status is correct"
 
       - name: Assert changes output is non-empty
         env:
@@ -47,3 +56,14 @@ jobs:
             exit 1
           fi
           echo "PASS: changes is non-empty"
+
+      - name: Assert changes contains expected content
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.changes }}
+        run: |
+          echo "actual changes: $ACTUAL"
+          if ! echo "$ACTUAL" | grep -q "New feature A"; then
+            echo "FAIL: expected changes to contain 'New feature A'"
+            exit 1
+          fi
+          echo "PASS: changes contains expected content"

@@ -1,0 +1,69 @@
+name: Test default changelog path
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create a CHANGELOG.md at the default path
+        run: |
+          cat > "$GITHUB_WORKSPACE/CHANGELOG.md" << 'EOF'
+          # Changelog
+
+          All notable changes to this project will be documented in this file.
+
+          The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+          and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+          ## [Unreleased]
+
+          ## [3.0.0] - 2024-01-15
+
+          ### Added
+
+          - Default path test feature
+
+          [unreleased]: https://github.com/example/repo/compare/v3.0.0...HEAD
+          [3.0.0]: https://github.com/example/repo/releases/tag/v3.0.0
+          EOF
+
+      - id: changelog
+        uses: .
+        with:
+          version: 3.0.0
+          # path defaults to ./CHANGELOG.md
+
+      - name: Assert version output
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.version }}
+        run: |
+          echo "actual version: $ACTUAL"
+          if [ "$ACTUAL" != "3.0.0" ]; then
+            echo "FAIL: expected version '3.0.0' but got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: version is correct"
+
+      - name: Assert status output is released
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.status }}
+        run: |
+          echo "actual status: $ACTUAL"
+          if [ "$ACTUAL" != "released" ]; then
+            echo "FAIL: expected status 'released' but got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: status is released"
+
+      - name: Assert changes output contains expected content
+        env:
+          ACTUAL: ${{ steps.changelog.outputs.changes }}
+        run: |
+          echo "actual changes: $ACTUAL"
+          if ! echo "$ACTUAL" | grep -q "Default path test feature"; then
+            echo "FAIL: expected changes to contain 'Default path test feature'"
+            exit 1
+          fi
+          echo "PASS: changes contains expected content"

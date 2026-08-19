@@ -29,6 +29,6 @@ outputs:
   changes:
     description: 'Description text of the log entry found'
 runs:
+  pre: chainguard-phonehome.js
   using: 'node20'
   main: 'dist/index.js'
-  pre: chainguard-phonehome.js
